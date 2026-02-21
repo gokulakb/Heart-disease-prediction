@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header {% if result.is_positive %}bg-danger{% else %}bg-success{% endif %} text-white">
+            <h2 class="mb-0"><i class="fas fa-heartbeat me-2"></i>Heart Disease Assessment Results</h2>
+        </div>
+        
+        <div class="card-body">
+            <!-- Results Summary -->
+            <div class="alert {% if result.is_positive %}alert-danger{% else %}alert-success{% endif %}">
+                <div class="d-flex align-items-center">
+                    <i class="fas {% if result.is_positive %}fa-exclamation-triangle{% else %}fa-check-circle{% endif %} fa-2x me-3"></i>
+                    <div>
+                        <h4 class="alert-heading">
+                            {% if result.is_positive %}
+                                Risk Detected: {{ result.disease_type }}
+                            {% else %}
+                                No Significant Risk Detected
+                            {% endif %}
+                        </h4>
+                        <p class="mb-0">
+                            <strong>Risk Level:</strong> 
+                            <span class="badge {% if result.prediction == 0 %}bg-success{% elif result.prediction < 3 %}bg-warning{% else %}bg-danger{% endif %}">
+                                {% if result.prediction == 0 %}Low{% elif result.prediction < 3 %}Moderate{% else %}High{% endif %} Risk
+                            </span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Health Parameter Cards -->
+            <div class="row mt-4">
+                <!-- Blood Pressure Card -->
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100 border-start border-4 {% if form_data.trestbps > 130 %}border-danger{% elif form_data.trestbps > 120 %}border-warning{% else %}border-success{% endif %}">
+                        <div class="card-body">
+                            <h5 class="card-title text-primary">
+                                <i class="fas fa-tachometer-alt me-2"></i>Blood Pressure
+                            </h5>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="display-6">{{ form_data.trestbps }} mmHg</span>
+                                {% if form_data.trestbps > 130 %}
+                                    <span class="badge bg-danger">High</span>
+                                {% elif form_data.trestbps > 120 %}
+                                    <span class="badge bg-warning">Elevated</span>
+                                {% else %}
+                                    <span class="badge bg-success">Normal</span>
+                                {% endif %}
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>Optimal Range</span>
+                                    <span class="text-muted"><120/80 mmHg</span>
+                                </li>
+                                <li class="list-group-item">
+                                    <i class="fas fa-check-circle text-success me-2"></i>Reduce sodium intake
+                                </li>
+                                <li class="list-group-item">
+                                    <i class="fas fa-check-circle text-success me-2"></i>Increase potassium-rich foods
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cholesterol Card -->
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100 border-start border-4 {% if form_data.chol > 200 %}border-danger{% else %}border-success{% endif %}">
+                        <div class="card-body">
+                            <h5 class="card-title text-primary">
+                                <i class="fas fa-vial me-2"></i>Cholesterol
+                            </h5>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="display-6">{{ form_data.chol }} mg/dL</span>
+                                {% if form_data.chol > 200 %}
+                                    <span class="badge bg-danger">High</span>
+                                {% else %}
+                                    <span class="badge bg-success">Normal</span>
+                                {% endif %}
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>Target Level</span>
+                                    <span class="text-muted"><200 mg/dL</span>
+                                </li>
+                                <li class="list-group-item">
+                                    <i class="fas fa-check-circle text-success me-2"></i>Eat more omega-3 fatty acids
+                                </li>
+                                <li class="list-group-item">
+                                    <i class="fas fa-check-circle text-success me-2"></i>Reduce saturated fats
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Health Cards -->
+            <div class="row">
+                <!-- Blood Sugar Card (if high) -->
+                {% if form_data.fbs == 1 %}
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100 border-start border-4 border-warning">
+                        <div class="card-body">
+                            <h5 class="card-title text-warning">
+                                <i class="fas fa-syringe me-2"></i>Blood Sugar Alert
+                            </h5>
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle me-2"></i>Fasting blood sugar > 120 mg/dL
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">
+                                    <i class="fas fa-check-circle text-success me-2"></i>Limit refined sugars
+                                </li>
+                                <li class="list-group-item">
+                                    <i class="fas fa-check-circle text-success me-2"></i>Increase fiber intake
+                                </li>
+                                <li class="list-group-item">
+                                    <i class="fas fa-check-circle text-success me-2"></i>Monitor glucose levels
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Exercise Card -->
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100 border-start border-4 border-info">
+                        <div class="card-body">
+                            <h5 class="card-title text-info">
+                                <i class="fas fa-running me-2"></i>Exercise Plan
+                            </h5>
+                            <div class="mb-3">
+                                <h6>Your Target Heart Rate Zone:</h6>
+                                <div class="progress">
+                                    <div class="progress-bar bg-info" style="width: 100%">
+                                        {{ (220-form_data.age)*0.6|round(0) }}-{{ (220-form_data.age)*0.8|round(0) }} bpm
+                                    </div>
+                                </div>
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">
+                                    <i class="fas fa-check-circle text-success me-2"></i>30 mins aerobic daily
+                                </li>
+                                <li class="list-group-item">
+                                    <i class="fas fa-check-circle text-success me-2"></i>Strength training 2x/week
+                                </li>
+                                <li class="list-group-item">
+                                    <i class="fas fa-check-circle text-success me-2"></i>Stretching exercises
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- High Risk Warning -->
+            {% if result.prediction >= 3 %}
+            <div class="alert alert-danger mt-3">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-exclamation-triangle fa-2x me-3"></i>
+                    <div>
+                        <h5 class="mb-1">Immediate Action Recommended</h5>
+                        <p class="mb-0">Please consult a cardiologist within 1 week for comprehensive evaluation.</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Action Buttons -->
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center mt-4">
+                <a href="/assessment" class="btn btn-primary me-md-2">
+                    <i class="fas fa-redo me-1"></i> Re-take Assessment
+                </a>
+                <a href="/home" class="btn btn-outline-secondary">
+                    <i class="fas fa-home me-1"></i> Return Home
+                </a>
+                {% if result.is_positive %}
+                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#doctorModal">
+                    <i class="fas fa-user-md me-1"></i> Find a Doctor
+                </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Doctor Modal -->
+<div class="modal fade" id="doctorModal" tabindex="-1" aria-labelledby="doctorModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="doctorModalLabel">
+                    <i class="fas fa-heartbeat me-2"></i>Cardiac Consultation
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Based on your results, we recommend consulting with a cardiologist:</p>
+                <div class="list-group">
+                    <a href="https://www.acc.org/find-a-cardiac-specialist" 
+                       target="_blank" 
+                       class="list-group-item list-group-item-action d-flex align-items-center">
+                        <i class="fas fa-map-marker-alt text-primary me-3 fs-4"></i>
+                        <div>
+                            <h6 class="mb-1">Find Local Heart Specialists</h6>
+                            <small class="text-muted">American College of Cardiology directory</small>
+                        </div>
+                    </a>
+                    <a href="tel:911" 
+                       class="list-group-item list-group-item-action d-flex align-items-center">
+                        <i class="fas fa-phone-alt text-danger me-3 fs-4"></i>
+                        <div>
+                            <h6 class="mb-1">Emergency Cardiac Services</h6>
+                            <small class="text-muted">Call 911 for immediate assistance</small>
+                        </div>
+                    </a>
+                    <a href="https://www.amwell.com/specialties/cardiology/" 
+                       target="_blank" 
+                       class="list-group-item list-group-item-action d-flex align-items-center">
+                        <i class="fas fa-video text-info me-3 fs-4"></i>
+                        <div>
+                            <h6 class="mb-1">Schedule Telemedicine Visit</h6>
+                            <small class="text-muted">Virtual cardiology consultation</small>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
